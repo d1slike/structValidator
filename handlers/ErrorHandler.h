@@ -7,7 +7,7 @@
 
 class ErrorHandler {
 public:
-    void operator<< (const char* message);
+    ErrorHandler operator<< (const char* message);
 };
 
 

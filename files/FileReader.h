@@ -18,19 +18,21 @@ class FileReader {
 
     char readNextChar();
     bool isOnEOF();
+    char tryReadNextChar();
+    bool isEmptyFile();
 public:
     FileReader(const char* name)
     {
         source = fopen(name, "r");
+        lastReaded = 0;
     }
     ~FileReader()
     {
-        fclose(source);
+        close();
     }
     bool isReady();
     char* readFull();
     void close();
-
 };
 
 

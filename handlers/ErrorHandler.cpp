@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include "ErrorHandler.h"
 
-void ErrorHandler::operator<<(const char *message) {
-    printf("ERROR: %s", message);
+ErrorHandler ErrorHandler::operator<<(const char *message) {
+    printf("ERROR: %s ", message);
+    return *this;
 }
