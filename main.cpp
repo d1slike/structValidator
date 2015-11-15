@@ -5,7 +5,7 @@
 #include "handlers/StructDefineValidator.h"
 
 int main(int argc, char **argv) {
-    setlocale(LC_ALL, "Russian");
+    setlocale(LC_ALL, ".1251");
     FileReader *file = new FileReader(argv[1]);
     StructDefineValidator validator(file, new ErrorHandler());
     validator.valid();

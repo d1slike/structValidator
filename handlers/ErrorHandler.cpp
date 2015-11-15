@@ -11,11 +11,11 @@ ErrorStream ErrorStream::operator<<(const char *message) {
 }
 
 ErrorStream ErrorHandler::error() {
-    printf("ÐžÐ¨Ð˜Ð‘ÐšÐ: ");
+    printf("ÎØÈÁÊÀ: ");
     return stream;
 }
 
 ErrorStream ErrorHandler::warn() {
-    printf("ÐŸÐ Ð•Ð”Ð£ÐŸÐ Ð•Ð–Ð”Ð•ÐÐ˜: ");
+    printf("ÏÐÅÄÓÏÐÅÆÄÅÍÈÅ: ");
     return stream;
 }

@@ -10,13 +10,13 @@
 void SimpleStringVector::add(const char *source) {
     array = (char **) realloc(array, ++size * sizeof(char **));
     if (array == nullptr) {
-        printf("РћС€РёР±РєР° РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё.");
+        printf("Ошибка выделения памяти.");
         exit(-1);
     }
     array[size - 1] = (char *) malloc((strlen(source) + 1) * sizeof(char));
     if (array[size - 1] == nullptr) {
         if (array == nullptr) {
-            printf("РћС€РёР±РєР° РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё.");
+            printf("Ошибка выделения памяти.");
             exit(-1);
         }
     }

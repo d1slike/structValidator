@@ -26,7 +26,7 @@ char *FileReader::readFull() {
         if (i == 10) {
             full = (char *) realloc(full, ((count + 10) * CHAR_SIZE));
             if (full == nullptr) {
-                printf("��������� ������, ���������� ���������.\n");
+                printf("????????? ??????, ?????????? ?????????.\n");
                 exit(-1);
             }
             /*if(tmp != full)

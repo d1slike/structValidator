@@ -9,18 +9,18 @@
 
 void StructDefineValidator::valid() {
     if (!reader->isReady()) {
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ñ‡Ñ‚ÐµÐ½Ð¸Ñ Ñ„Ð°Ð¹Ð»Ð°! Ð¤Ð°Ð¹Ð» Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ð¸Ð»Ð¸ Ð¿ÑƒÑÑ‚.\n";
+        handler.error() << "Îøèáêà ÷òåíèÿ ôàéëà! Ôàéë îòñóòñòâóåò èëè ïóñò.\n";
         exit(-1);
     }
     /*if(reader->isEmptyFile())
     {
-        handler << "ÐžÑˆÐ¸Ð±ÐºÐ° Ñ‡Ñ‚ÐµÐ½Ð¸Ñ Ñ„Ð°Ð¹Ð»Ð°! Ð¤Ð°Ð¹Ð» Ð¿ÑƒÑÑ‚.";
+        handler << "Îøèáêà ÷òåíèÿ ôàéëà! Ôàéë ïóñò.";
         exit(-1);
     }*/
     source = reader->readFull();
     reader->close();
     if (strlen(source) <= 1) {
-        handler.error() << "Ð˜ÑÑ…Ð¾Ð´Ð½Ñ‹Ð¹ Ñ„Ð°Ð¹Ð» Ð¿ÑƒÑÑ‚.\n";
+        handler.error() << "Èñõîäíûé ôàéë ïóñò.\n";
         return;
     }
     if (!checkHeadDefine() || !checkBraketsAndLastSemicolon() || !readAndCheckFields())
@@ -32,7 +32,7 @@ bool StructDefineValidator::checkHeadDefine() {
 
     source = strstr(source, "struct");
     if (source == nullptr || !isspace(source[6])) {
-        handler.error() << "ÐžÐ¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ðµ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð½Ð¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð° Ð² Ð¸ÑÑ…Ð¾Ð´Ð½Ð¾Ð¼ Ñ„Ð°Ð¹Ð»Ðµ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾.\n";
+        handler.error() << "Îïðåäåëåíèå ñòðóêòóðíîãî òèïà â èñõîäíîì ôàéëå íå íàéäåíî.\n";
         return false;
     }
 
@@ -63,35 +63,35 @@ bool StructDefineValidator::checkName(const char *name) {
 
     for (; i < nameLen; i++)
         if (!isspace(*(name + i))) {
-            handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ðµ (" << name << ").\n";
+            handler.error() << "Îøèáêà îïðåäåëåíèÿ â èäåíòèôèêàòîðå (" << name << ").\n";
             delete clearName;
             return false;
         }
 
     if (!(isalpha(*clearName) || *clearName == '_')) {
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² Ð¸Ð½Ð´ÐµÑ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ðµ (" << clearName << "). ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚.\n";
+        handler.error() << "Îøèáêà îïðåäåëåíèÿ â èíäåòèôèêàòîðå (" << clearName << "). Íåâåðíûé ôîðìàò.\n";
         delete clearName;
         return false;
     }
     const int clearNameLen = strlen(clearName);
     if (clearNameLen > 255) {
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ðµ (" << clearName <<
-        "). Ð”Ð»Ð¸Ð½Ð½Ð°Ñ Ð¸Ð¼ÐµÐ½Ð¸ Ð½Ðµ Ð´Ð¾Ð»Ð¶Ð½Ð° Ð¿Ñ€ÐµÐ²Ñ‹ÑˆÐ°Ñ‚ÑŒ 255.\n";
+        handler.error() << "Îøèáêà îïðåäåëåíèÿ â èäåíòèôèêàòîðå (" << clearName <<
+        "). Äëèííàÿ èìåíè íå äîëæíà ïðåâûøàòü 255.\n";
         delete clearName;
         return false;
     }
 
     for (int i = 1; i < clearNameLen; i++)
         if (!(isalpha(*(clearName + i)) || isdigit(*(clearName + i)) || *(clearName + i) == '_')) {
-            handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² Ð¸Ð½Ð´ÐµÑ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ðµ (" << clearName << "). ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚.\n";
+            handler.error() << "Îøèáêà îïðåäåëåíèÿ â èíäåòèôèêàòîðå (" << clearName << "). Íåâåðíûé ôîðìàò.\n";
             delete clearName;
             return false;
         }
 
     for (int i = 0; i < KEY_WORDS_COUNT; i++)
         if (!strcmp(clearName, keyWordsHolder->getWord(i))) {
-            handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² Ð¸Ð½Ð´ÐµÑ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ðµ (" << clearName <<
-            "). Ð¡Ð¾Ð²Ð¿Ð°Ð´ÐµÐ½Ð¸Ðµ Ñ ÐºÐ»ÑŽÑ‡ÐµÐ²Ñ‹Ð¼ ÑÐ»Ð¾Ð²Ð¾Ð¼.\n";
+            handler.error() << "Îøèáêà îïðåäåëåíèÿ â èíäåòèôèêàòîðå (" << clearName <<
+            "). Ñîâïàäåíèå ñ êëþ÷åâûì ñëîâîì.\n";
             delete clearName;
             return false;
         }
@@ -104,18 +104,18 @@ bool StructDefineValidator::checkName(const char *name) {
 bool StructDefineValidator::checkBraketsAndLastSemicolon() {
     char *openBraket = strchr(source, '{');
     if (openBraket == nullptr) {
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´Ð»ÐµÐ½Ð¸Ñ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹. ÐžÑ‚ÑÑƒÑ‚ÑÑ‚Ð²Ð¸Ðµ '{'.\n";
+        handler.error() << "Îøèáêà îïðåäëåíèÿ ñòðóêòóðû. Îòñóòñòâèå '{'.\n";
         return false;
     }
     char *nextOpenBraket = strchr(openBraket + 1, '{');
     if (nextOpenBraket != nullptr) {
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹. ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚.\n";
+        handler.error() << "Îøèáêà îïðåäåëåíèÿ ñòðóêòóðû. Íåâåðíûé ôîðìàò.\n";
         return false;
     }
 
     char *closeBraket = strchr(source, '}');
     if (closeBraket == nullptr) {
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´Ð»ÐµÐ½Ð¸Ñ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹. ÐžÑ‚ÑÑƒÑ‚ÑÑ‚Ð²Ð¸Ðµ '}'.\n";
+        handler.error() << "Îøèáêà îïðåäëåíèÿ ñòðóêòóðû. Îòñóòñòâèå '}'.\n";
         return false;
     }
     closeBraket++;
@@ -124,13 +124,13 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
         if (*closeBraket == ';')
             semicolonCheked = true;
         else if (!isspace(*closeBraket)) {
-            handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹. ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚.\n";
+            handler.error() << "Îøèáêà îïðåäåëåíèÿ ñòðóêòóðû. Íåâåðíûé ôîðìàò.\n";
             return false;
         }
         closeBraket++;
     }
     if (!semicolonCheked)
-        handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ñ‹. ÐžÑ‚ÑÑƒÑ‚ÑÐ²Ð¸Ðµ ';'.\n";
+        handler.error() << "Îøèáêà îïðåäåëåíèÿ ñòðóêòóðû. Îòñóòñâèå ';'.\n";
     return semicolonCheked;
 }
 
@@ -142,7 +142,7 @@ bool StructDefineValidator::readAndCheckFields() {
     while (isspace(*source))
         source++;
     if (*source == '}') {
-        handler.warn() << "ÐžÐ¿Ñ€ÐµÐ´Ð»ÐµÐ½Ð° ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° Ð±ÐµÐ· Ð¿Ð¾Ð»ÐµÐ¹.\n";
+        handler.warn() << "Îïðåäëåíà ñòðóêòóðà áåç ïîëåé.\n";
         return false;
     }
 
@@ -158,7 +158,7 @@ bool StructDefineValidator::readAndCheckFields() {
             if (i >= 10) {
                 fieldType[9] = '\0';
                 handler.error() <<
-                "ÐÐµÐ´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð² Ð² Ñ‚Ð¸Ð¿Ðµ. Ð”Ð»Ð¸Ð½Ð½Ð° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€ÐµÐ²Ð¾ÑÑ…Ð¾Ð´Ð¸Ñ‚ÑŒ 10 ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð². ÐÐ°Ñ‡Ð°Ð»Ð¾ Ð½ÐµÐ´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ð¾Ð³Ð¾ Ñ‚Ð¸Ð¿Ð°:(" <<
+                "Íåäîïóñòèìîå êîëè÷åñòâî ñèìâîëîâ â òèïå. Äëèííà íå ìîæåò ïðåâîñõîäèòü 10 ñèìâîëîâ. Íà÷àëî íåäîïóñòèìîãî òèïà:(" <<
                 fieldType <<
                 ").\n";
                 return false;
@@ -176,8 +176,8 @@ bool StructDefineValidator::readAndCheckFields() {
         }
         else {
             if (i >= 255) {
-                handler.error() << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½Ð¸Ñ Ð² Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€Ðµ (" << fieldName <<
-                "). Ð”Ð»Ð¸Ð½Ð½Ð°Ñ Ð¸Ð¼ÐµÐ½Ð¸ Ð½Ðµ Ð´Ð¾Ð»Ð¶Ð½Ð° Ð¿Ñ€ÐµÐ²Ñ‹ÑˆÐ°Ñ‚ÑŒ 255.\n";
+                handler.error() << "Îøèáêà îïðåäåëåíèÿ â èäåíòèôèêàòîðå (" << fieldName <<
+                "). Äëèííàÿ èìåíè íå äîëæíà ïðåâûøàòü 255.\n";
             }
             if (emptyName) {
                 if (!isspace(*source) && *source != ';') {
@@ -185,7 +185,7 @@ bool StructDefineValidator::readAndCheckFields() {
                     fieldName[i++] = *source;
                 }
                 else if (*source == ';') {
-                    handler.error() << "Ð£ Ð¿Ð¾Ð»Ñ Ñ‚Ð¸Ð¿Ð° (" << fieldType << ") Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½ Ð¸Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€.\n";
+                    handler.error() << "Ó ïîëÿ òèïà (" << fieldType << ") íå íàéäåí èäåíòèôèêàòîð.\n";
                     ok = false;
                     continue;
                 }
@@ -203,7 +203,7 @@ bool StructDefineValidator::readAndCheckFields() {
                         continue;
                     }
                     if (nameCache.contains(fieldName)) {
-                        handler.error() << "Ð˜Ð´ÐµÐ½Ñ‚Ð¸Ñ„Ð¸ÐºÐ°Ñ‚Ð¾Ñ€ " << fieldName << " ÑƒÐ¶Ðµ Ð¾Ð¿Ñ€ÐµÐ´ÐµÐ»ÐµÐ½.";
+                        handler.error() << "Èäåíòèôèêàòîð " << fieldName << " óæå îïðåäåëåí.";
                         ok = false;
                         continue;
                     }
@@ -227,6 +227,6 @@ bool StructDefineValidator::checkType(const char *type) {
         if (!strcmp(type, types[i]))
             contains = true;
     if (!contains)
-        handler.error() << "ÐÐµÐ´Ð¾Ð¿ÑƒÑÑ‚Ð¸Ð¼Ñ‹Ð¹ Ñ‚Ð¸Ð¿ Ð´Ð°Ð½Ð½Ñ‹Ñ…. (" << type << ")\n";
+        handler.error() << "Íåäîïóñòèìûé òèï äàííûõ. (" << type << ")\n";
     return contains;
 }

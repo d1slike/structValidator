@@ -21,14 +21,12 @@ class StructDefineValidator {
     KeyWordsArray* keyWordsHolder;
 
     char* source;
-    int lineInSource;
 
     bool checkHeadDefine();
     bool checkBraketsAndLastSemicolon();
     bool readAndCheckFields();
 
     bool checkName(const char *name);
-
     bool checkType(const char *type);
 public:
 
@@ -38,7 +36,6 @@ public:
         this->handler = *handler;
         hPointer = handler;
         source = nullptr;
-        lineInSource = 0;
         keyWordsHolder = new KeyWordsArray();
     }
 

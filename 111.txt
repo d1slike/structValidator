@@ -1,4 +1,2 @@
 struct def_____{
-    int len1;;;
-    int len;
 };
