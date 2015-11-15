@@ -18,8 +18,6 @@ class FileReader {
 
     char readNextChar();
     bool isOnEOF();
-    char tryReadNextChar();
-    bool isEmptyFile();
 public:
     FileReader(const char* name)
     {

@@ -2,11 +2,20 @@
 // Created by DisDev on 14.11.2015.
 //
 
-#include <iostream>
 #include <stdio.h>
 #include "ErrorHandler.h"
 
-ErrorHandler ErrorHandler::operator<<(const char *message) {
-    printf("ERROR: %s ", message);
+ErrorStream ErrorStream::operator<<(const char *message) {
+    printf("%s", message);
     return *this;
+}
+
+ErrorStream ErrorHandler::error() {
+    printf("ньхайю: ");
+    return stream;
+}
+
+ErrorStream ErrorHandler::warn() {
+    printf("опедсопефдемх: ");
+    return stream;
 }

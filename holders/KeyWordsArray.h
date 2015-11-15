@@ -6,6 +6,7 @@
 #define STRUCTVALIDATOR_KEYWORDSARRAY_H
 
 #define KEY_WORDS_COUNT 84
+#define TYPES_COUNT 6
 
 #include <stdlib.h>
 #include <string.h>
@@ -14,11 +15,14 @@
 class KeyWordsArray {
 
     char** array;
+    char **typeArray;
 
 public:
     KeyWordsArray();
     ~KeyWordsArray();
     char * getWord(int pos);
+
+    char **getArrayOfTypes();
 
 };
 

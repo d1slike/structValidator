@@ -7,29 +7,26 @@
 #include "FileReader.h"
 
 bool FileReader::isReady() {
-    return source != nullptr && !isEmptyFile();
+    return source != nullptr;
 }
 
 void FileReader::close() {
-    if(source != nullptr)
+    if (source != nullptr)
         fclose(source);
     source = nullptr;
 }
 
 char *FileReader::readFull() {
-    char* full = (char*) malloc(CHAR_SIZE * 10);
+    char *full = (char *) malloc(CHAR_SIZE * 10);
     int count = 0;
     int i = 0;
-    while(!isOnEOF())
-    {
+    while (!isOnEOF()) {
         full[count++] = readNextChar();
         i++;
-        if(i == 10)
-        {
+        if (i == 10) {
             full = (char *) realloc(full, ((count + 10) * CHAR_SIZE));
-            if(full == nullptr)
-            {
-                printf("Нехватака памяти, завершение программы.\n");
+            if (full == nullptr) {
+                printf("пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.\n");
                 exit(-1);
             }
             /*if(tmp != full)
@@ -45,10 +42,10 @@ char *FileReader::readFull() {
 }
 
 char FileReader::readNextChar() {
-    if(!isReady())
+    if (!isReady())
         return EOF;
     lastReaded = fgetc(source);
-    if(isOnEOF())
+    if (isOnEOF())
         return '\0';
     return lastReaded;
 }
@@ -57,11 +54,5 @@ bool FileReader::isOnEOF() {
     return lastReaded == EOF;
 }
 
-bool FileReader::isEmptyFile() {
-    return tryReadNextChar() == EOF;
-}
 
-char FileReader::tryReadNextChar() {
 
-    return fgetc(source);
-}

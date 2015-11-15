@@ -5,9 +5,23 @@
 #ifndef STRUCTVALIDATOR_ERRORHANDLER_H
 #define STRUCTVALIDATOR_ERRORHANDLER_H
 
-class ErrorHandler {
+class ErrorStream {
 public:
-    ErrorHandler operator<< (const char* message);
+    ErrorStream operator<<(const char *message);
+};
+
+class ErrorHandler {
+    ErrorStream stream;
+public:
+
+    ErrorHandler() {
+        stream = ErrorStream();
+    }
+
+public:
+    ErrorStream error();
+
+    ErrorStream warn();
 };
 
 

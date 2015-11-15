@@ -11,7 +11,7 @@
 #include "ErrorHandler.h"
 #include "../holders/KeyWordsArray.h"
 
-class Validator {
+class StructDefineValidator {
 
     //static const char[][10] = {{}};
 
@@ -27,13 +27,12 @@ class Validator {
     bool checkBraketsAndLastSemicolon();
     bool readAndCheckFields();
 
-    bool checkName(char* name);
-    bool checkName(char* name, int nameLentgh);
+    bool checkName(const char *name);
 
-
+    bool checkType(const char *type);
 public:
 
-    Validator(FileReader* reader, ErrorHandler* handler)
+    StructDefineValidator(FileReader *reader, ErrorHandler *handler)
     {
         this->reader = reader;
         this->handler = *handler;
@@ -43,7 +42,7 @@ public:
         keyWordsHolder = new KeyWordsArray();
     }
 
-    ~Validator()
+    ~StructDefineValidator()
     {
         delete reader;
         delete hPointer;

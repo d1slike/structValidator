@@ -1,1 +1,4 @@
-jjeifhhe hu4hurth4uht 4 ``kekkr
+struct def_____{
+    int len1;;;
+    int len;
+};
