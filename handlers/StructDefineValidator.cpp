@@ -23,7 +23,7 @@ void StructDefineValidator::valid() {
         handler.error() << "Исходный файл пуст.\n";
         return;
     }
-    if (!checkHeadDefine() || !checkBraketsAndLastSemicolon() || !readAndCheckFields())
+    if (!checkBraketsAndLastSemicolon() || !checkHeadDefine() || !readAndCheckFields())
         return;
     printf("Код корректен.\n\n%s", source);
 }

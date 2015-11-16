@@ -1,5 +1,5 @@
 struct def_____ {
 
 
-    long;;;;int ll_1;
-};;;;;;
+    long f;;;;int ll_1;
+};
