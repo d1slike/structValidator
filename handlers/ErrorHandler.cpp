@@ -19,3 +19,21 @@ ErrorStream ErrorHandler::warn() {
     printf("ÏĞÅÄÓÏĞÅÆÄÅÍÈÅ: ");
     return stream;
 }
+
+ErrorStream ErrorHandler::error(const char *source, const char *startErrorPointer) {
+    printf("ÎØÈÁÊÀ: Ñòğîêà(%d): ", calcLineNumber(source, startErrorPointer) + 1);
+    return stream;
+}
+
+int ErrorHandler::calcLineNumber(const char *source, const char *startErrorPointer) {
+    int endlCount = 0;
+    while (source != startErrorPointer)
+        if (*(startErrorPointer--) == '\n')
+            endlCount++;
+    return endlCount;
+}
+
+ErrorStream ErrorStream::operator<<(const char message) {
+    printf("%c", message);
+    return *this;
+}

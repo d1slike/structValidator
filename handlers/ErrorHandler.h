@@ -5,9 +5,13 @@
 #ifndef STRUCTVALIDATOR_ERRORHANDLER_H
 #define STRUCTVALIDATOR_ERRORHANDLER_H
 
+#define ENDL '\n'
+
 class ErrorStream {
 public:
     ErrorStream operator<<(const char *message);
+
+    ErrorStream operator<<(const char message);
 };
 
 class ErrorHandler {
@@ -18,9 +22,12 @@ public:
         stream = ErrorStream();
     }
 
+    int calcLineNumber(const char *source, const char *startErrorPointer);
+
 public:
     ErrorStream error();
 
+    ErrorStream error(const char *source, const char *startErrorPointer);
     ErrorStream warn();
 };
 

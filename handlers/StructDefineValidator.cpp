@@ -9,7 +9,7 @@
 
 void StructDefineValidator::valid() {
     if (!reader->isReady()) {
-        handler.error() << "Ошибка чтения файла! Файл отсутствует или пуст.\n";
+        handler.error() << "Ошибка чтения файла! Файл отсутствует\n";
         exit(-1);
     }
     /*if(reader->isEmptyFile())
@@ -25,14 +25,14 @@ void StructDefineValidator::valid() {
     }
     if (!checkHeadDefine() || !checkBraketsAndLastSemicolon() || !readAndCheckFields())
         return;
-    handler.error() << "OK";
+    printf("Код корректен.\n\n%s", source);
 }
 
 bool StructDefineValidator::checkHeadDefine() {
 
     source = strstr(source, "struct");
     if (source == nullptr || !isspace(source[6])) {
-        handler.error() << "Определение структурного типа в исходном файле не найдено.\n";
+        handler.error() << INVALID_STRUCT_MESSAGE << "Определение структурного типа в исходном файле не найдено.\n";
         return false;
     }
 
@@ -63,19 +63,19 @@ bool StructDefineValidator::checkName(const char *name) {
 
     for (; i < nameLen; i++)
         if (!isspace(*(name + i))) {
-            handler.error() << "Ошибка определения в идентификаторе (" << name << ").\n";
+            handler.error() << INVALID_NAME_MESSAGE << "(" << name << ").\n";
             delete clearName;
             return false;
         }
 
     if (!(isalpha(*clearName) || *clearName == '_')) {
-        handler.error() << "Ошибка определения в индетификаторе (" << clearName << "). Неверный формат.\n";
+        handler.error() << INVALID_NAME_MESSAGE << "(" << clearName << "). Неверный формат.\n";
         delete clearName;
         return false;
     }
     const int clearNameLen = strlen(clearName);
     if (clearNameLen > 255) {
-        handler.error() << "Ошибка определения в идентификаторе (" << clearName <<
+        handler.error() << INVALID_NAME_MESSAGE << "(" << clearName <<
         "). Длинная имени не должна превышать 255.\n";
         delete clearName;
         return false;
@@ -83,14 +83,14 @@ bool StructDefineValidator::checkName(const char *name) {
 
     for (int i = 1; i < clearNameLen; i++)
         if (!(isalpha(*(clearName + i)) || isdigit(*(clearName + i)) || *(clearName + i) == '_')) {
-            handler.error() << "Ошибка определения в индетификаторе (" << clearName << "). Неверный формат.\n";
+            handler.error() << INVALID_NAME_MESSAGE << "(" << clearName << "). Неверный формат.\n";
             delete clearName;
             return false;
         }
 
     for (int i = 0; i < KEY_WORDS_COUNT; i++)
         if (!strcmp(clearName, keyWordsHolder->getWord(i))) {
-            handler.error() << "Ошибка определения в индетификаторе (" << clearName <<
+            handler.error() << INVALID_NAME_MESSAGE << "(" << clearName <<
             "). Совпадение с ключевым словом.\n";
             delete clearName;
             return false;
@@ -104,48 +104,55 @@ bool StructDefineValidator::checkName(const char *name) {
 bool StructDefineValidator::checkBraketsAndLastSemicolon() {
     char *openBraket = strchr(source, '{');
     if (openBraket == nullptr) {
-        handler.error() << "Ошибка опредления структуры. Отсутствие '{'.\n";
+        handler.error() << INVALID_STRUCT_MESSAGE << "Отсутствие '{'.\n";
         return false;
     }
     char *nextOpenBraket = strchr(openBraket + 1, '{');
     if (nextOpenBraket != nullptr) {
-        handler.error() << "Ошибка определения структуры. Неверный формат.\n";
+        handler.error(source, nextOpenBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ({).\n";
         return false;
     }
 
     char *closeBraket = strchr(source, '}');
     if (closeBraket == nullptr) {
-        handler.error() << "Ошибка опредления структуры. Отсутствие '}'.\n";
+        handler.error() << INVALID_STRUCT_MESSAGE << "Отсутствие '}'.\n";
         return false;
     }
+
+    char *nextCloseBraket = strchr(closeBraket + 1, '}');
+    if (nextCloseBraket != nullptr) {
+        handler.error(source, nextCloseBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ({).\n";
+        return false;
+    }
+
     closeBraket++;
-    bool semicolonCheked = false;
+    bool semicolonChecked = false;
     while (*closeBraket) {
         if (*closeBraket == ';')
-            semicolonCheked = true;
+            semicolonChecked = true;
         else if (!isspace(*closeBraket)) {
-            handler.error() << "Ошибка определения структуры. Неверный формат.\n";
+            handler.error(source, closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ '" << *closeBraket <<
+            ")\n";
             return false;
         }
         closeBraket++;
     }
-    if (!semicolonCheked)
-        handler.error() << "Ошибка определения структуры. Отсутсвие ';'.\n";
-    return semicolonCheked;
+    if (!semicolonChecked)
+        handler.error() << INVALID_STRUCT_MESSAGE << "Отсутсвие ';'.\n";
+    return semicolonChecked;
 }
 
 
 bool StructDefineValidator::readAndCheckFields() {
     SimpleStringVector nameCache;
-    source = strchr(source, '{');
-    source++;
-    while (isspace(*source))
-        source++;
-    if (*source == '}') {
+    char *copyOfSource = strchr(source, '{');
+    copyOfSource++;
+    while (isspace(*copyOfSource))
+        copyOfSource++;
+    if (*copyOfSource == '}') {
         handler.warn() << "Опредлена структура без полей.\n";
         return false;
     }
-
 
     char *fieldType = new char[10];
     char *fieldName = new char[257];
@@ -153,18 +160,22 @@ bool StructDefineValidator::readAndCheckFields() {
     bool emptyName = true;
     int i = 0;
     bool ok = true;
-    while (*source != '}' && ok) {
+    bool findSpace = false;
+    bool lastNameCheked = false;
+
+    while ((*copyOfSource != '}' || !lastNameCheked) && ok) {
         if (readType) {
             if (i >= 10) {
                 fieldType[9] = '\0';
-                handler.error() <<
+                handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE
+                <<
                 "Недопустимое количество символов в типе. Длинна не может превосходить 10 символов. Начало недопустимого типа:(" <<
                 fieldType <<
                 ").\n";
                 return false;
             }
-            if (!isspace(*source) && *source != ';')
-                fieldType[i++] = *source;
+            if (!isspace(*copyOfSource) && *copyOfSource != ';')
+                fieldType[i++] = *copyOfSource;
             else if (i) {
                 fieldType[i] = '\0';
                 i = 0;
@@ -172,28 +183,40 @@ bool StructDefineValidator::readAndCheckFields() {
                     ok = false;
                 readType = false;
                 emptyName = true;
+                continue;
             }
         }
         else {
             if (i >= 255) {
-                handler.error() << "Ошибка определения в идентификаторе (" << fieldName <<
+                handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE << "(" << fieldName <<
                 "). Длинная имени не должна превышать 255.\n";
             }
             if (emptyName) {
-                if (!isspace(*source) && *source != ';') {
+                if (!isspace(*copyOfSource) && *copyOfSource != ';') {
                     emptyName = false;
-                    fieldName[i++] = *source;
+                    fieldName[i++] = *copyOfSource;
                 }
-                else if (*source == ';') {
-                    handler.error() << "У поля типа (" << fieldType << ") не найден идентификатор.\n";
+                else if (*copyOfSource == ';') {
+                    handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE << "У поля типа (" << fieldType <<
+                    ") не найден идентификатор.\n";
                     ok = false;
                     continue;
                 }
 
             }
             else {
-                if (*source != ';')
-                    fieldName[i++] = *source;
+                lastNameCheked = false;
+                if (*copyOfSource != ';') {
+                    if (isspace(*copyOfSource)) {
+                        findSpace = true;
+                    }
+                    if (!isspace(*copyOfSource) && findSpace) {
+                        handler.error(source, copyOfSource) << INVALID_STRUCT_MESSAGE << "Отсутствие ;\n";
+                        ok = false;
+                        continue;
+                    } else if (!findSpace)
+                        fieldName[i++] = *copyOfSource;
+                }
                 else {
                     readType = true;
                     fieldName[i] = '\0';
@@ -203,16 +226,18 @@ bool StructDefineValidator::readAndCheckFields() {
                         continue;
                     }
                     if (nameCache.contains(fieldName)) {
-                        handler.error() << "Идентификатор " << fieldName << " уже определен.";
+                        handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE << "Идентификатор " << fieldName <<
+                        " уже определен.\n";
                         ok = false;
                         continue;
                     }
                     nameCache.add(fieldName);
+                    lastNameCheked = true;
                 }
             }
 
         }
-        source++;
+        copyOfSource++;
     }
     delete fieldName;
     delete fieldType;
@@ -227,6 +252,6 @@ bool StructDefineValidator::checkType(const char *type) {
         if (!strcmp(type, types[i]))
             contains = true;
     if (!contains)
-        handler.error() << "Недопустимый тип данных. (" << type << ")\n";
+        handler.error() << INVALID_STRUCT_MESSAGE << "Недопустимый тип данных. (" << type << ")\n";
     return contains;
 }

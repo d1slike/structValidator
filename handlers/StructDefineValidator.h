@@ -11,6 +11,9 @@
 #include "ErrorHandler.h"
 #include "../holders/KeyWordsArray.h"
 
+#define INVALID_STRUCT_MESSAGE "Некорректное опредление структуры. "
+#define INVALID_NAME_MESSAGE "Некорректное опредление индетификатора. "
+
 class StructDefineValidator {
 
     //static const char[][10] = {{}};

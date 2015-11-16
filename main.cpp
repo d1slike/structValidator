@@ -9,6 +9,7 @@ int main(int argc, char **argv) {
     FileReader *file = new FileReader(argv[1]);
     StructDefineValidator validator(file, new ErrorHandler());
     validator.valid();
+    printf("\nНажмите любую клавишу для завершения...\n");
     getch();
     return 0;
 }
