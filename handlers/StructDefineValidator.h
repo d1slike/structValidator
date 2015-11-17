@@ -25,6 +25,8 @@ class StructDefineValidator {
 
     char* source;
 
+    bool typeGlobalDefine;
+
     bool checkHeadDefine();
     bool checkBraketsAndLastSemicolon();
     bool readAndCheckFields();
@@ -39,6 +41,7 @@ public:
         this->handler = *handler;
         hPointer = handler;
         source = nullptr;
+        typeGlobalDefine = true;
         keyWordsHolder = new KeyWordsArray();
     }
 

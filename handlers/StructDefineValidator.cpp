@@ -23,7 +23,7 @@ void StructDefineValidator::valid() {
         handler.error() << "Исходный файл пуст.\n";
         return;
     }
-    if (!checkBraketsAndLastSemicolon() || !checkHeadDefine() || !readAndCheckFields())
+    if (!checkHeadDefine() || !checkBraketsAndLastSemicolon() || !readAndCheckFields())
         return;
     printf("Код корректен.\n\n%s", source);
 }
@@ -40,12 +40,17 @@ bool StructDefineValidator::checkHeadDefine() {
     char *structName = new char[257];
     int len = 0;
 
-    while (isspace(*tmp) && &tmp)
+    while (isspace(*tmp) && *tmp)
         tmp++;
     while (*tmp && *tmp != '{' && len < 256)
         structName[len++] = *tmp++;
     structName[len] = '\0';
-    if (!checkName(structName)) {
+    if (!strlen(structName)) {
+        typeGlobalDefine = false;
+        delete structName;
+        return true;
+    }
+    else if (!checkName(structName)) {
         delete structName;
         return false;
     }
@@ -119,27 +124,44 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
         return false;
     }
 
-    char *nextCloseBraket = strchr(closeBraket + 1, '}');
+    /*char *nextCloseBraket = strchr(closeBraket + 1, '}');
     if (nextCloseBraket != nullptr) {
         handler.error(source, nextCloseBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ({).\n";
         return false;
-    }
+    }*/
+    char *name = new char[257];
+    int i = 0;
 
     closeBraket++;
-    bool semicolonChecked = false;
+    bool isCorrect = false;
     while (*closeBraket) {
-        if (*closeBraket == ';')
-            semicolonChecked = true;
-        else if (!isspace(*closeBraket)) {
-            handler.error(source, closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ '" << *closeBraket <<
+        if (*closeBraket == ';') {
+            isCorrect = true;
+        }
+        else if (isCorrect && !isspace(*closeBraket)) {
+            handler.error(source, closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ (" << *closeBraket <<
             ")\n";
             return false;
         }
+        else if (!isspace(*closeBraket) && i < 256) {
+            /*handler.error(source, closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ '" << *closeBraket <<
+            ")\n";
+            return false;*/
+            name[i++] = *closeBraket;
+        }
         closeBraket++;
     }
-    if (!semicolonChecked)
+    name[i] = '\0';
+    if (!isCorrect)
         handler.error() << INVALID_STRUCT_MESSAGE << "Отсутсвие ';'.\n";
-    return semicolonChecked;
+    if (!typeGlobalDefine) {
+        if (!strlen(name))
+            handler.warn() << "Определена анонимная стркутура.\n";
+        else
+            isCorrect = checkName(name);
+    }
+    delete[] name;
+    return isCorrect;
 }
 
 

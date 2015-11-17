@@ -1,5 +1,5 @@
-struct def_____ {
-
-
-    long f;;;;int ll_1;
-};
+struct {
+    int a;
+    long c;
+} o9;
+k6
