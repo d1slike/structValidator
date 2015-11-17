@@ -154,7 +154,7 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
     name[i] = '\0';
     if (!isCorrect)
         handler.error() << INVALID_STRUCT_MESSAGE << "Отсутсвие ';'.\n";
-    if (!typeGlobalDefine) {
+    if (!typeGlobalDefine && isCorrect) {
         if (!strlen(name))
             handler.warn() << "Определена анонимная стркутура.\n";
         else
