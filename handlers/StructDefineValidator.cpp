@@ -124,11 +124,11 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
         return false;
     }
 
-    /*char *nextCloseBraket = strchr(closeBraket + 1, '}');
+    char *nextCloseBraket = strchr(closeBraket + 1, '}');
     if (nextCloseBraket != nullptr) {
-        handler.error(source, nextCloseBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ({).\n";
+        handler.error(source, nextCloseBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ(}).\n";
         return false;
-    }*/
+    }
     char *name = new char[257];
     int i = 0;
 
