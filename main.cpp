@@ -6,8 +6,8 @@
 
 int main(int argc, char **argv) {
     setlocale(LC_ALL, ".1251");
-    FileReader *file = new FileReader(argv[1]);
-    StructDefineValidator validator(file, new ErrorHandler());
+    //FileReader *file = new FileReader(argv[1]);
+    StructDefineValidator validator(new FileReader(argv[1]), new ErrorHandler());
     validator.valid();
     printf("\nНажмите любую клавишу для завершения...\n");
     getch();

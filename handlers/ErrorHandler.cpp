@@ -3,6 +3,7 @@
 //
 
 #include <stdio.h>
+#include <string.h>
 #include "ErrorHandler.h"
 
 ErrorStream ErrorStream::operator<<(const char *message) {
@@ -20,15 +21,19 @@ ErrorStream ErrorHandler::warn() {
     return stream;
 }
 
-ErrorStream ErrorHandler::error(const char *source, const char *startErrorPointer) {
-    printf("ÎØÈÁÊÀ: Ñòðîêà(%d): ", calcLineNumber(source, startErrorPointer) + 1);
+ErrorStream ErrorHandler::error(const char *startErrorPointer) {
+    printf("ÎØÈÁÊÀ: Ñòðîêà(%d): ", calcLineNumber(startErrorPointer) + 1);
     return stream;
 }
 
-int ErrorHandler::calcLineNumber(const char *source, const char *startErrorPointer) {
+int ErrorHandler::calcLineNumber(const char *startErrorPointer) {
     int endlCount = 0;
-    while (source != startErrorPointer)
-        if (*(startErrorPointer--) == '\n')
+    char *start = startSource;
+    if (start == nullptr)
+        return -2;
+    char *end = strstr(start, startErrorPointer);
+    while (start < end)
+        if (*(start++) == '\n')
             endlCount++;
     return endlCount;
 }
@@ -36,4 +41,8 @@ int ErrorHandler::calcLineNumber(const char *source, const char *startErrorPoint
 ErrorStream ErrorStream::operator<<(const char message) {
     printf("%c", message);
     return *this;
+}
+
+void ErrorHandler::setStartSourcePointer(char *source) {
+    startSource = source;
 }

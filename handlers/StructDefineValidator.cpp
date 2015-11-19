@@ -17,15 +17,32 @@ void StructDefineValidator::valid() {
         handler << "Ошибка чтения файла! Файл пуст.";
         exit(-1);
     }*/
-    source = reader->readFull();
+    char *full;
+    full = reader->readFull();
     reader->close();
-    if (strlen(source) <= 1) {
-        handler.error() << "Исходный файл пуст.\n";
-        return;
+    source = new char[strlen(full)];
+    handler.setStartSourcePointer(full);
+
+    char *startStruct = strchr(full, '~');
+    startStruct++;
+    char *endStruct = strchr(startStruct, '~');
+    int i = 0;
+    while (endStruct != nullptr) {
+        while (startStruct != endStruct) {
+            source[i++] = *startStruct;
+            startStruct++;
+        }
+        source[i] = '\0';
+        if (checkHeadDefine() && checkBraketsAndLastSemicolon() && readAndCheckFields())
+            printf("\n\nКод корректен.\n%s\n\n", source);
+        i = 0;
+        typeGlobalDefine = true;
+        startStruct++;
+        endStruct = strchr(startStruct, '~');
     }
-    if (!checkHeadDefine() || !checkBraketsAndLastSemicolon() || !readAndCheckFields())
-        return;
-    printf("Код корректен.\n\n%s", source);
+    free(full);
+    delete[] source;
+
 }
 
 bool StructDefineValidator::checkHeadDefine() {
@@ -54,7 +71,7 @@ bool StructDefineValidator::checkHeadDefine() {
         delete structName;
         return false;
     }
-    delete structName;
+    delete[] structName;
 
 }
 
@@ -114,7 +131,7 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
     }
     char *nextOpenBraket = strchr(openBraket + 1, '{');
     if (nextOpenBraket != nullptr) {
-        handler.error(source, nextOpenBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ({).\n";
+        handler.error(nextOpenBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ({).\n";
         return false;
     }
 
@@ -126,7 +143,7 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
 
     char *nextCloseBraket = strchr(closeBraket + 1, '}');
     if (nextCloseBraket != nullptr) {
-        handler.error(source, nextCloseBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ(}).\n";
+        handler.error(nextCloseBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ(}).\n";
         return false;
     }
     char *name = new char[257];
@@ -139,14 +156,11 @@ bool StructDefineValidator::checkBraketsAndLastSemicolon() {
             isCorrect = true;
         }
         else if (isCorrect && !isspace(*closeBraket)) {
-            handler.error(source, closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ (" << *closeBraket <<
+            handler.error(closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ (" << *closeBraket <<
             ")\n";
             return false;
         }
         else if (!isspace(*closeBraket) && i < 256) {
-            /*handler.error(source, closeBraket) << INVALID_STRUCT_MESSAGE << "Недопустимый символ '" << *closeBraket <<
-            ")\n";
-            return false;*/
             name[i++] = *closeBraket;
         }
         closeBraket++;
@@ -189,7 +203,7 @@ bool StructDefineValidator::readAndCheckFields() {
         if (readType) {
             if (i >= 10) {
                 fieldType[9] = '\0';
-                handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE
+                handler.error(copyOfSource) << INVALID_NAME_MESSAGE
                 <<
                 "Недопустимое количество символов в типе. Длинна не может превосходить 10 символов. Начало недопустимого типа:(" <<
                 fieldType <<
@@ -210,7 +224,7 @@ bool StructDefineValidator::readAndCheckFields() {
         }
         else {
             if (i >= 255) {
-                handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE << "(" << fieldName <<
+                handler.error(copyOfSource) << INVALID_NAME_MESSAGE << "(" << fieldName <<
                 "). Длинная имени не должна превышать 255.\n";
             }
             if (emptyName) {
@@ -219,7 +233,7 @@ bool StructDefineValidator::readAndCheckFields() {
                     fieldName[i++] = *copyOfSource;
                 }
                 else if (*copyOfSource == ';') {
-                    handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE << "У поля типа (" << fieldType <<
+                    handler.error(copyOfSource) << INVALID_NAME_MESSAGE << "У поля типа (" << fieldType <<
                     ") не найден идентификатор.\n";
                     ok = false;
                     continue;
@@ -229,11 +243,11 @@ bool StructDefineValidator::readAndCheckFields() {
             else {
                 lastNameCheked = false;
                 if (*copyOfSource != ';') {
-                    if (isspace(*copyOfSource)) {
+                    if (isspace(*copyOfSource) || *copyOfSource == '}') {
                         findSpace = true;
                     }
                     if (!isspace(*copyOfSource) && findSpace) {
-                        handler.error(source, copyOfSource) << INVALID_STRUCT_MESSAGE << "Отсутствие ;\n";
+                        handler.error(copyOfSource) << INVALID_STRUCT_MESSAGE << "Отсутствие ;\n";
                         ok = false;
                         continue;
                     } else if (!findSpace)
@@ -248,7 +262,7 @@ bool StructDefineValidator::readAndCheckFields() {
                         continue;
                     }
                     if (nameCache.contains(fieldName)) {
-                        handler.error(source, copyOfSource) << INVALID_NAME_MESSAGE << "Идентификатор " << fieldName <<
+                        handler.error(copyOfSource) << INVALID_NAME_MESSAGE << "Идентификатор " << fieldName <<
                         " уже определен.\n";
                         ok = false;
                         continue;

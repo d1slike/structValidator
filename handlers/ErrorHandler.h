@@ -16,18 +16,22 @@ public:
 
 class ErrorHandler {
     ErrorStream stream;
+    char *startSource;
 public:
 
     ErrorHandler() {
         stream = ErrorStream();
+        startSource = nullptr;
     }
 
-    int calcLineNumber(const char *source, const char *startErrorPointer);
+    int calcLineNumber(const char *startErrorPointer);
 
 public:
     ErrorStream error();
 
-    ErrorStream error(const char *source, const char *startErrorPointer);
+    void setStartSourcePointer(char *source);
+
+    ErrorStream error(const char *startErrorPointer);
     ErrorStream warn();
 };
 
